@@ -1,0 +1,12 @@
+#!/bin/sh
+thisdir=`dirname $0`
+outdir=`dirname $1`
+fbname=$(basename "$1" .jl)
+java -cp "${thisdir}/src:$CLASSPATH" jlc $1
+llvm-as $fbname.ll
+cp "${thisdir}/${fbname}.ll" "$outdir"
+cp "${thisdir}/${fbname}.bc" "$outdir"
+rm "${thisdir}/${fbname}.ll"
+rm "${thisdir}/${fbname}.bc"
+ 
+

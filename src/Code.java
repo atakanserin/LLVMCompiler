@@ -1,0 +1,727 @@
+import Javalette.Absyn.*;
+
+//////////////////////////////////////////////////////////////////////////
+class Fun {
+    public String id;
+    public FunType funType;
+    public Fun (String id, FunType funType) {
+        this.id = id;
+        this.funType = funType;
+    }
+    public String toLLVM() {
+        return id + funType.toLLVM();
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class Label {
+    public int label;
+    public Label (int label) {
+        this.label = label;
+    }
+    public String toLLVM() {
+        return "L" + label;
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////
+abstract class Code {
+    public abstract <R> R accept (CodeVisitor<R> v);
+}
+
+//////////////////////////////////////////////////////////////////////////
+class Comment extends Code {
+    public String comment;
+    public Comment (String c) { comment = c; }
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class Alloca extends Code {
+    public TypeCode type;
+    public int ptr, length;
+    
+    public Alloca (int ptr, TypeCode type) {
+        this.type   = type;
+        this.ptr    = ptr;
+        this.length = 0;
+    }
+    
+    public Alloca (int ptr, TypeCode type, int length) {
+        this.type   = type;
+        this.ptr    = ptr;
+        this.length = length;
+    }
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class Store extends Code {
+    public TypeCode type;
+    public int reg;
+    public int ptr;
+    public Store (TypeCode type, int reg, int ptr) {
+        this.type = type;
+        this.reg  = reg;
+        this.ptr  = ptr;
+    }
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class Load extends Code {
+    public TypeCode type;
+    public int reg;
+    public int ptr;
+    public Load (TypeCode type, int reg, int ptr) {
+        this.type = type;
+        this.reg=reg;
+        this.ptr = ptr;
+    }
+    public <R> R accept (CodeVisitor<R> v) { return v.visit(this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class Add extends Code {
+    public int arg0, arg1, res;
+    public TypeCode type;
+    public Add (TypeCode type, int arg0, int arg1, int res) {
+        this.arg0 = arg0;
+        this.arg1 = arg1;
+        this.res = res;
+        this.type = type;
+        
+    }
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class AddZero extends Code {
+    public int reg;
+    public double arg;
+    public TypeCode type;
+    public AddZero (TypeCode type, double arg, int reg) {
+        this.type = type;
+        this.arg = arg;
+        this.reg = reg;
+        
+        
+    }
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class Sub extends Code {
+    public int arg0, arg1, res;
+    public TypeCode type;
+    public Sub (TypeCode type, int arg0, int arg1, int res) {
+        this.arg0 = arg0;
+        this.arg1 = arg1;
+        this.res = res;
+        this.type = type;
+        
+    }
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class Mul extends Code {
+    public int arg0, arg1, res;
+    public TypeCode type;
+    public Mul (TypeCode type, int arg0, int arg1, int res) {
+        this.arg0 = arg0;
+        this.arg1 = arg1;
+        this.res = res;
+        this.type = type;
+        
+    }
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class Div extends Code {
+    public int arg0, arg1, res;
+    public TypeCode type;
+    public Div (TypeCode type, int arg0, int arg1, int res) {
+        this.arg0 = arg0;
+        this.arg1 = arg1;
+        this.res = res;
+        this.type = type;
+        
+    }
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class Mod extends Code {
+    public int arg0, arg1, res;
+    public TypeCode type;
+    public Mod (TypeCode type, int arg0, int arg1, int res) {
+        this.arg0 = arg0;
+        this.arg1 = arg1;
+        this.res = res;
+        this.type = type;
+        
+    }
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class CmpLT extends Code {
+    public int arg0, arg1, res;
+    public TypeCode type;
+    public CmpLT (TypeCode type, int arg0, int arg1, int res) {
+        this.arg0 = arg0;
+        this.arg1 = arg1;
+        this.res = res;
+        this.type = type;
+        
+    }
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class CmpLE extends Code {
+    public int arg0, arg1, res;
+    public TypeCode type;
+    public CmpLE (TypeCode type, int arg0, int arg1, int res) {
+        this.arg0 = arg0;
+        this.arg1 = arg1;
+        this.res = res;
+        this.type = type;
+        
+    }
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class CmpGT extends Code {
+    public int arg0, arg1, res;
+    public TypeCode type;
+    public CmpGT (TypeCode type, int arg0, int arg1, int res) {
+        this.arg0 = arg0;
+        this.arg1 = arg1;
+        this.res = res;
+        this.type = type;
+        
+    }
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class CmpGE extends Code {
+    public int arg0, arg1, res;
+    public TypeCode type;
+    public CmpGE (TypeCode type, int arg0, int arg1, int res) {
+        this.arg0 = arg0;
+        this.arg1 = arg1;
+        this.res = res;
+        this.type = type;
+    }
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class CmpEQ extends Code {
+    public int arg0, arg1, res;
+    public TypeCode type;
+    public CmpEQ (TypeCode type, int arg0, int arg1, int res) {
+        this.arg0 = arg0;
+        this.arg1 = arg1;
+        this.res = res;
+        this.type = type;
+        
+    }
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class CmpNE extends Code {
+    public int arg0, arg1, res;
+    public TypeCode type;
+    public CmpNE (TypeCode type, int arg0, int arg1, int res) {
+        this.arg0 = arg0;
+        this.arg1 = arg1;
+        this.res = res;
+        this.type = type;
+    }
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class And extends Code {
+    public int arg0, arg1, res;
+    public TypeCode type;
+    public And (TypeCode type, int arg0, int arg1, int res) {
+        this.arg0 = arg0;
+        this.arg1 = arg1;
+        this.res = res;
+        this.type = type;
+    }
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class Or extends Code {
+    public int arg0, arg1, res;
+    public TypeCode type;
+    public Or (TypeCode type, int arg0, int arg1, int res) {
+        this.arg0 = arg0;
+        this.arg1 = arg1;
+        this.res = res;
+        this.type = type;
+    }
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class Return extends Code {
+    public TypeCode type;
+    public int reg;
+    public Return (TypeCode type, int reg) {
+        this.type = type;
+        this.reg  = reg;
+    }
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class GetElementPtr extends Code {
+    public TypeCode type;
+    public int size, reg, array, index;
+    public GetElementPtr (TypeCode type, int reg, int array, int index) {
+        this.type  = type;
+        this.reg   = reg;
+        this.array = array;
+        this.index = index;
+    }
+    
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class GetElementFromArray extends Code {
+    public TypeCode type;
+    public int reg, array, index;
+    public GetElementFromArray (TypeCode type, int reg, int array, int index) {
+        this.type  = type;
+        this.reg   = reg;
+        this.array = array;
+        this.index = index;
+    }
+    
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class Calloc extends Code{
+    public TypeCode type;
+    public int sizeReg;
+    public int ptr;
+    public Calloc(int ptr, int sizeReg, TypeCode type){
+        this.type = type;
+        this.sizeReg = sizeReg;
+        this.ptr  = ptr;
+    }
+    
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+class BitCast extends Code{
+    public TypeCode type;
+    public int ptr, reg;
+    public BitCast(int reg, int ptr, TypeCode type){
+        this.type = type;
+        this.ptr  = ptr;
+        this.reg  = reg;
+    }
+    
+    public <R> R accept (CodeVisitor<R> v) { return v.visit (this); }
+}
+
+//////////////////////////////////////////////////////////////////////////
+interface CodeVisitor<R> {
+    public R visit (Comment c);
+    public R visit (Add c);
+    public R visit (AddZero c);
+    public R visit (Sub c);
+    public R visit (Mul c);
+    public R visit (Div c);
+    public R visit (Mod c);
+    public R visit (CmpLT c);
+    public R visit (CmpLE c) ;
+    public R visit (CmpGT c) ;
+    public R visit (CmpGE c) ;
+    public R visit (CmpEQ c) ;
+    public R visit (CmpNE c) ;
+    public R visit (And c) ;
+    public R visit (Or c) ;
+    public R visit (Alloca c);
+    public R visit (Store c);
+    public R visit (Load c);
+    public R visit (Return c);
+    public R visit (GetElementPtr c);
+    public R visit (GetElementFromArray c);
+    public R visit (Calloc c);
+    public R visit (BitCast c);
+}
+
+//////////////////////////////////////////////////////////////////////////
+class CodeToLLVM implements CodeVisitor<String> {
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit (Comment c) {
+        return "\n  ; " + c.comment;
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit (Add c) {
+        String output = new String();
+        if( c.type == TypeCode.CInt ) {
+            output = "%t"+c.res+" = add i32 %t"+c.arg0+", %t" + c.arg1;
+        }else if( c.type == TypeCode.CDouble ){
+            output = "%t"+c.res+" = fadd double %t"+c.arg0+", %t" + c.arg1;
+        }else if(c.type == TypeCode.CBool){
+            output = "%t"+c.res+" = add i1 %t"+c.arg0+", %t" + c.arg1;
+        }
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit (AddZero c) {
+        String output = new String();
+        if( c.type == TypeCode.CInt ) {
+            output = "%t"+c.reg+" = add i32 0, " + (int)c.arg;
+        }else if(c.type == TypeCode.CDouble){
+            output = "%t"+c.reg+" = fadd double 0.0, " + c.arg;
+        }else if(c.type == TypeCode.CBool){
+            output = "%t"+c.reg+" = add i1 0, " + (int)c.arg;
+        }
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit (Sub c) {
+        String output = new String();
+        if(  c.type == TypeCode.CInt ) {
+            output = "%t"+c.res+" = sub i32 %t"+c.arg0+", %t" + c.arg1;
+        }else if( c.type == TypeCode.CDouble ){
+            output = "%t"+c.res+" = fsub double %t"+c.arg0+", %t" + c.arg1;
+        }
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit (Mul c) {
+        String output = new String();
+        if( c.type == TypeCode.CInt ) {
+            output = "%t"+c.res+" = mul i32 %t"+c.arg0+", %t" + c.arg1;
+        }else if( c.type == TypeCode.CDouble ){
+            output = "%t"+c.res+" = fmul double %t"+c.arg0+", %t" + c.arg1;
+        }
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit (Div c) {
+        String output = new String();
+        if(  c.type == TypeCode.CInt ) {
+            output = "%t"+c.res+" = sdiv i32 %t"+c.arg0+", %t" + c.arg1;
+        }else if( c.type == TypeCode.CDouble ){
+            output = "%t"+c.res+" = fdiv double %t"+c.arg0+", %t" + c.arg1;
+        }
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit (Mod c) {
+        String output = new String();
+        if( c.type == TypeCode.CInt ) {
+            output = "%t"+c.res+" = srem i32 %t"+c.arg0+", %t" + c.arg1;
+        }
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit (CmpLT c) {
+        String output = new String();
+        if( c.type == TypeCode.CInt ) {
+            output = "%t"+c.res+" = icmp slt i32 %t"+c.arg0+", %t" + c.arg1;
+        }else if( c.type == TypeCode.CDouble ){
+            output = "%t"+c.res+" = fcmp olt double %t"+c.arg0+", %t" + c.arg1;
+        }
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit (CmpLE c) {
+        String output = new String();
+        if( c.type == TypeCode.CInt ) {
+            output = "%t"+c.res+" = icmp sle i32 %t"+c.arg0+", %t" + c.arg1;
+        }else if( c.type == TypeCode.CDouble ){
+            output = "%t"+c.res+" = fcmp ole double %t"+c.arg0+", %t" + c.arg1;
+        }
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit (CmpGT c) {
+        String output = new String();
+        if( c.type == TypeCode.CInt ) {
+            output = "%t"+c.res+" = icmp sgt i32 %t"+c.arg0+", %t" + c.arg1;
+        }else if( c.type == TypeCode.CDouble ){
+            output = "%t"+c.res+" = fcmp ogt double %t"+c.arg0+", %t" + c.arg1;
+        }
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit (CmpGE c) {
+        String output = new String();
+        if( c.type == TypeCode.CInt ) {
+            output = "%t"+c.res+" = icmp sge i32 %t"+c.arg0+", %t" + c.arg1;
+        }else if( c.type == TypeCode.CDouble ){
+            output = "%t"+c.res+" = fcmp oge double %t"+c.arg0+", %t" + c.arg1;
+        }
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit (CmpEQ c) {
+        String output = new String();
+        if( c.type == TypeCode.CInt ) {
+            output = "%t"+c.res+" = icmp eq i32 %t"+c.arg0+", %t" + c.arg1;
+        }else if( c.type == TypeCode.CDouble ){
+            output = "%t"+c.res+" = fcmp oeq double %t"+c.arg0+", %t" + c.arg1;
+        }else if( c.type == TypeCode.CBool ) {
+            output = "%t"+c.res+" = icmp eq i1 %t"+c.arg0+", %t" + c.arg1;
+        }else{
+            throw new RuntimeException( "\"==\" : can't operate on type \"void\"");
+        }
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit (CmpNE c) {
+        String output = new String();
+        if( c.type == TypeCode.CInt ) {
+            output = "%t"+c.res+" = icmp ne i32 %t"+c.arg0+", %t" + c.arg1;
+        }else if( c.type == TypeCode.CDouble ){
+            output = "%t"+c.res+" = fcmp one double %t"+c.arg0+", %t" + c.arg1;
+        }else if( c.type == TypeCode.CBool ) {
+            output = "%t"+c.res+" = icmp eq i1 %t"+c.arg0+", %t" + c.arg1;
+        }else{
+            throw new RuntimeException( "\"!=\" : can't operate on type \"void\"");
+        }
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit (And c) {
+        String output = new String();
+        output = "%t"+c.res+" = and i1 %t"+c.arg0+", %t" + c.arg1;
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit (Or c) {
+        String output = new String();
+        output = "%t"+c.res+" = or i1 %t"+c.arg0+", %t" + c.arg1;
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit (Alloca c){
+        String output = "";
+        String ARRAY_INT    = "{i32, [0 x i32]}*";
+        String ARRAY_DOUBLE = "{i32, [0 x double]}*";
+        String ARRAY_BOOL   = "{i32, [0 x i1]}*";
+        
+        if( c.type == TypeCode.CInt ){
+            output = "%t"+c.ptr+" = alloca i32";
+        }else if(c.type == TypeCode.CDouble){
+            output = "%t"+c.ptr+" = alloca double";
+        }else if(c.type == TypeCode.CBool){
+            output = "%t"+c.ptr+" = alloca i1";
+        }else if(c.type == TypeCode.CArrayInt){
+            output = "%t" + c.ptr + " = alloca " + ARRAY_INT ;
+        }else if(c.type == TypeCode.CArrayDouble){
+            output = "%t" + c.ptr + " = alloca " + ARRAY_DOUBLE ;
+        }else if(c.type == TypeCode.CArrayBool){
+            output = "%t" + c.ptr + " = alloca " + ARRAY_BOOL ;
+        }else{
+            throw new RuntimeException( "Alloca: Can't allocate memorey for type = " + c.type );
+        }
+        
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit (Store c){
+        String output = "";
+        String ARRAY_INT    = "{i32, [0xi32]}*";
+        String ARRAY_DOUBLE = "{i32, [0xdouble]}*";
+        String ARRAY_BOOL   = "{i32, [0xi1]}*";
+        
+        if( c.type == TypeCode.CInt ) {
+            output = "store i32 %t" +c.reg+", i32* %t"+c.ptr ;
+        }else if(c.type  == TypeCode.CDouble){
+            output = "store double %t" +c.reg+", double* %t"+c.ptr ;
+        }else if(c.type  == TypeCode.CBool){
+            output = "store i1 %t" +c.reg+", i1* %t"+c.ptr ;
+        }else if( c.type == TypeCode.CArrayInt ) {
+            output = "store {i32, [0 x i32]}* %t" +c.reg+", {i32, [0 x i32]}** %t"+c.ptr ;
+        }else if(c.type  == TypeCode.CArrayDouble){
+            output = "store {i32, [0 x double]}* %t" +c.reg+", {i32, [0 x double]}** %t"+c.ptr ;
+        }else if(c.type  == TypeCode.CArrayBool){
+            output = "store {i32, [0 x i1]}* %t" +c.reg+", {i32, [0 x i1]}** %t"+c.ptr ;
+        }else {
+            throw new RuntimeException( "Only Boolean, Integer, Doubles and Arrays can use store! ");
+        }
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit (Load c){
+        String output = "";
+        if( c.type == TypeCode.CInt ){
+            output = "%t"+c.reg+" = load i32, i32* %t"+c.ptr ;
+        }else if( c.type == TypeCode.CDouble ){
+            output = "%t"+c.reg+" = load double, double* %t"+c.ptr ;
+        }else if( c.type == TypeCode.CBool ){
+            output = "%t"+c.reg+" = load i1, i1* %t"+c.ptr ;
+        }else if( c.type == TypeCode.CArrayInt ) {
+            output = "%t"+c.reg+" = load {i32, [0 x i32]}*, {i32, [0 x i32]}** %t"+c.ptr ;
+        }else if(c.type  == TypeCode.CArrayDouble){
+            output = "%t"+c.reg+" = load {i32, [0 x double]}*, {i32, [0 x double]}** %t"+c.ptr ;
+        }else if(c.type  == TypeCode.CArrayBool){
+            output = "%t"+c.reg+" = load {i32, [0 x i1]}*, {i32, [0 x i1]}** %t"+c.ptr;
+        }else {
+            throw new RuntimeException( "Only Boolean, Integer, Doubles and Arrays can use load! ");
+        }
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit (Return c) {
+        String output = "";
+        if (c.type == TypeCode.CVoid){
+            output = "ret void";
+        }
+        else if (c.type == TypeCode.CDouble){
+            output = "ret double ";
+            output += "%t" + c.reg;
+        }
+        else if (c.type == TypeCode.CInt){
+            output = "ret i32 ";
+            output += "%t" + c.reg;
+        }
+        else if (c.type == TypeCode.CBool){
+            output = "ret i1 ";
+            output += "%t" + c.reg;
+        }
+        else if (c.type == TypeCode.CArrayInt){
+            output = "ret {i32, [0 x i32]}** ";
+            output += "%t" + c.reg;
+        }
+        else if (c.type == TypeCode.CArrayDouble){
+            output = "ret {i32, [0 x double]}** ";
+            output += "%t" + c.reg;
+        }
+        else if (c.type == TypeCode.CArrayBool){
+            output = "ret {i32, [0 x i1]}** ";
+            output += "%t" + c.reg;
+        }
+        else{
+            throw new RuntimeException( "Cant use return opeartion on variable with type = " + c.type );
+        }
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit( GetElementPtr c ){
+        String output = "";
+        String ARRAY_INT    = "{i32, [0 x i32]}";
+        String ARRAY_DOUBLE = "{i32, [0 x double]}";
+        String ARRAY_BOOL   = "{i32, [0 x i1]}";
+        
+        if (c.type == TypeCode.CInt){
+            String type = "i32";
+            String array = "%t" + c.array;
+            String retReg = "%t" + c.reg;
+            output += retReg + " = getelementptr " + type + ", " + type + "* " + array + ", i32 0, i32 " + c.index;
+        }else if (c.type == TypeCode.CDouble){
+            String type = "double";
+            String array = "%t" + c.array;
+            String retReg = "%t" + c.reg;
+            output += retReg + " = getelementptr " + type + ", " + type + "* " + array + ", i32 0, i32 " + c.index;
+        }else if (c.type == TypeCode.CBool){
+            String type = "i1";
+            String array = "%t" + c.array;
+            String retReg = "%t" + c.reg;
+            output += retReg + " = getelementptr " + type + ", " + type + "* " + array + ", i32 0, i32 " + c.index;
+        }else if (c.type == TypeCode.CArrayInt){
+            String array = "%t" + c.array;
+            String retReg = "%t" + c.reg;
+            output += retReg + " = getelementptr " + ARRAY_INT + ", " + ARRAY_INT + "* " + array + ", i32 0, i32 " + c.index;
+        }else if (c.type == TypeCode.CArrayDouble){
+            String array = "%t" + c.array;
+            String retReg = "%t" + c.reg;
+            output += retReg + " = getelementptr " + ARRAY_DOUBLE + ", " + ARRAY_DOUBLE + "* " + array + ", i32 0, i32 " + c.index;
+        }else if (c.type == TypeCode.CArrayBool){
+            String array = "%t" + c.array;
+            String retReg = "%t" + c.reg;
+            output += retReg + " = getelementptr " + ARRAY_BOOL + ", " + ARRAY_BOOL + "* " + array + ", i32 0, i32 " + c.index;
+        }else{
+            throw new RuntimeException( "GetElmentPtr: Index = " + c.index );
+        }
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit( GetElementFromArray c ){
+        String output = "";
+        
+        if (c.type == TypeCode.CArrayInt){
+            String type = "{i32, [0 x i32]}";
+            String array = "%t" + c.array;
+            String retReg = "%t" + c.reg;
+            output += retReg + " = getelementptr " + type + ", " + type + "* " + array + ", i32 0, i32 1, i32 %t" + c.index;
+        }else if (c.type == TypeCode.CArrayDouble){
+            String type = "{i32, [0 x double]}";
+            String array = "%t" + c.array;
+            String retReg = "%t" + c.reg;
+            output += retReg + " = getelementptr " + type + ", " + type + "* " + array + ", i32 0, i32 1, i32 %t" + c.index;
+        }else if (c.type == TypeCode.CArrayBool){
+            String type = "{i32, [0 x i1]}";
+            String array = "%t" + c.array;
+            String retReg = "%t" + c.reg;
+            output += retReg + " = getelementptr " + type + ", " + type + "* " + array + ", i32 0, i32 1, i32 %t" + c.index;
+        }else{
+            throw new RuntimeException( "GetElmentFromArray: Index = " + c.index );
+        }
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit( Calloc c ){
+        String output = "%t" + c.ptr + " = call i8* @calloc( i32 %t" + c.sizeReg + ", i32 1 )";
+        return output+"\n";
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    public String visit( BitCast c ){
+        String output = "";
+        if( c.type == TypeCode.CArrayInt ){
+            output += "%t" + c.reg + " = bitcast i8* %t" + c.ptr + " to {i32, [0 x i32]}*";
+        }else if( c.type == TypeCode.CArrayDouble ){
+            output += "%t" + c.reg + " = bitcast i8* %t" + c.ptr + " to {i32, [0 x double]}*";
+        }else if( c.type == TypeCode.CArrayBool ){
+            output += "%t" + c.reg + " = bitcast i8* %t" + c.ptr + " to {i32, [0 x i1]}*";
+        }else{
+            throw new RuntimeException( "BitCast: can't use bitcast( destRegister, type ) when type = \"" + c.type + "\" " );
+        }
+        return output+"\n";
+    }
+}
