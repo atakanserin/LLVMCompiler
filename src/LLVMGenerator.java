@@ -187,11 +187,9 @@ public class LLVMGenerator{
     
     ////////////////////////////////////////////////////////////////////////
     boolean isArrayType( TypeCode tc ){
-        if( tc == TypeCode.CArrayInt || tc == TypeCode.CArrayDouble || tc == TypeCode.CArrayBool )
-            return true;
-        else
-            return false;
-        
+        return    (tc == TypeCode.CArrayInt 
+                || tc == TypeCode.CArrayDouble 
+                || tc == TypeCode.CArrayBool );
     }
     
     ////////////////////////////////////////////////////////////////////////
